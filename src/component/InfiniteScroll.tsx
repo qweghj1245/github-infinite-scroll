@@ -28,15 +28,15 @@ export default function InfiniteScroll<T>(props: Props<T>) {
 
   const scrollListRef = useRef<HTMLDivElement | null>(null);
 
-  const renderListHeightChange = (v: T & InfiniteScrollComputeType) => {
-    let id = v.infiniteScrollId;
+  const renderListHeightChange = (item: T & InfiniteScrollComputeType) => {
+    const id = item.infiniteScrollId;
     if (
-      !v.hasRenderBefore &&
+      !item.hasRenderBefore &&
       scrollListRef?.current &&
       (scrollListRef.current!.childNodes as NodeListOf<HTMLDivElement>)[id]
     ) {
       const all = allList;
-      let offsetHeight = (
+      const offsetHeight = (
         scrollListRef.current!.childNodes as NodeListOf<HTMLDivElement>
       )[id].offsetHeight;
       all[id].itemHeight = offsetHeight;
