@@ -13,7 +13,7 @@ type Props<T> = {
   list: T[];
   renderItem: (item: T) => JSX.Element;
   renderCount: number;
-  keyExtractor: (item: T) => number;
+  keyExtractor: (item: T & InfiniteScrollComputeType) => number;
   itemHeight: number;
   apiSignalIndex: number;
   onFetchApiSignal: (currentIndex?: number) => void;
@@ -81,8 +81,8 @@ export default function InfiniteScroll<T>(props: Props<T>) {
           Math.min(i + renderCount, allList.length)
         );
         setRenderList(renderListSlice);
-        renderListSlice.forEach((i) => {
-          renderListHeightChange(i);
+        renderListSlice.forEach((item) => {
+          renderListHeightChange(item);
         });
 
         // call api's condition
@@ -115,10 +115,10 @@ export default function InfiniteScroll<T>(props: Props<T>) {
         : list.filter((item, index) => !map.has(index));
       const allListExtendsConfig = filterNewList.map((item, index) => ({
         ...item,
-        infiniteScrollId: index,
+        infiniteScrollId: allList.length + index,
         hasRenderBefore: false,
         renderListKey: Date.now(),
-        itemOffsetTop: index * itemHeight,
+        itemOffsetTop: (allList.length + index) * itemHeight,
         itemHeight,
       }));
       setAllList(
@@ -142,7 +142,7 @@ export default function InfiniteScroll<T>(props: Props<T>) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list, itemHeight, renderCount]);
+  }, [list, itemHeight, renderCount, hasNewData]);
 
   return (
     <div className="scroll-container" onScroll={onScroll}>
@@ -160,7 +160,7 @@ export default function InfiniteScroll<T>(props: Props<T>) {
           <div
             className="scroll-item"
             key={keyExtractor(item)}
-            data-key={item.infiniteScrollId}
+            data-key={keyExtractor(item)}
           >
             {renderItem(item)}
           </div>

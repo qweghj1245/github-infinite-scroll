@@ -67,7 +67,9 @@ export default function App() {
             );
           } else {
             setHasError(true);
-            window.alert("noooooooo, rate limit!!!");
+            window.alert(
+              "noooooooo, rate limit!!! Please check api or manually reload"
+            );
           }
         }, 400);
       }
@@ -94,10 +96,10 @@ export default function App() {
       <InfiniteScroll
         list={githubRepos.items}
         renderItem={(item) => <GithubCard cardData={item} />}
-        keyExtractor={({ id }) => id}
+        keyExtractor={({ infiniteScrollId }) => infiniteScrollId}
         itemHeight={266}
         renderCount={30}
-        apiSignalIndex={6}
+        apiSignalIndex={5}
         hasNewData={pageLimit.page === 1}
         onFetchApiSignal={onUpdateFetchConfig}
       />
