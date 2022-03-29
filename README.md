@@ -4,7 +4,7 @@
 
 # 執行方式
 
-npm start
+yarn start
 
 # Feature
 
