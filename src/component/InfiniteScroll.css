@@ -1,7 +1,8 @@
 .scroll-container {
   height: 100%;
   overflow-y: auto;
-  position: relative
+  position: relative;
+  padding: 40px;
 }
 
 .scroll-list {

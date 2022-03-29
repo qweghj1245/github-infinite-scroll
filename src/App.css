@@ -1,0 +1,12 @@
+.app-wrapper {
+  height: calc(100% - 74px); /* 定義外部容器高 */
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.search-input {
+  padding: 16px;
+  width: 100%;
+  font-size: 16px;
+}
