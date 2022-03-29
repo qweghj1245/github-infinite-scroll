@@ -1,10 +1,10 @@
 # Github Infinite Scroll
 
-[DEMO]()
+[DEMO](https://github-infinite-scroll.vercel.app/)
 
 # 執行方式
 
-npm start
+yarn start
 
 # Feature
 
