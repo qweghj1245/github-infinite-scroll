@@ -4,12 +4,16 @@ import "./App.css";
 import GithubCard from "./component/GithubCard";
 import InfiniteScroll from "./component/InfiniteScroll";
 
+const renderCount = 30;
+const renderHeight = 266;
+
 export default function App() {
+  const [hasError, setHasError] = useState<boolean>(false);
+  const [pageQueue, setPageQueue] = useState<number[]>([]);
   const [searchText, setSearchText] = useState<string>("flippy");
   const [pageLimit, setPageLimit] = useState<{ perPage: number; page: number }>(
     { perPage: 30, page: 1 }
   );
-  const [pageQueue, setPageQueue] = useState<number[]>([]);
   const [alreadyFetchPage, setAlreadyFetchPage] = useState<Set<number>>(
     new Set([1])
   );
@@ -18,11 +22,14 @@ export default function App() {
     totalCount: 0,
     items: [],
   });
-  const [hasError, setHasError] = useState<boolean>(false);
 
   const timer = useRef<ReturnType<typeof setTimeout>>();
 
   const onUpdateFetchConfig = (index?: number) => {
+    if (index && githubRepos.totalCount <= renderCount * index) {
+      return;
+    }
+
     if (index && !alreadyFetchPage.has(index)) {
       setPageQueue([...pageQueue, index]);
       setAlreadyFetchPage((prevState) => {
@@ -31,6 +38,16 @@ export default function App() {
         return set;
       });
     }
+  };
+
+  const onChangeSearchAndReset = (text: string) => {
+    setSearchText(text);
+    setPageLimit({
+      page: 1,
+      perPage: 30,
+    });
+    setPageQueue([]);
+    setAlreadyFetchPage(new Set([1]));
   };
 
   useEffect(() => {
@@ -85,20 +102,14 @@ export default function App() {
         type="text"
         placeholder="搜尋 repos..."
         value={searchText}
-        onChange={(e) => {
-          setSearchText(e.target.value);
-          setPageLimit({
-            page: 1,
-            perPage: 30,
-          });
-        }}
+        onChange={(e) => onChangeSearchAndReset(e.target.value)}
       />
       <InfiniteScroll
         list={githubRepos.items}
         renderItem={(item) => <GithubCard cardData={item} />}
         keyExtractor={({ infiniteScrollId }) => infiniteScrollId}
-        itemHeight={266}
-        renderCount={30}
+        itemHeight={renderHeight}
+        renderCount={renderCount}
         apiSignalIndex={5}
         hasNewData={pageLimit.page === 1}
         onFetchApiSignal={onUpdateFetchConfig}

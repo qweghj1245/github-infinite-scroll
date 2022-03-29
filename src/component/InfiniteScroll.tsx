@@ -39,6 +39,7 @@ export default function InfiniteScroll<T>(props: Props<T>) {
     (T & InfiniteScrollComputeType)[]
   >([]);
 
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const scrollListRef = useRef<HTMLDivElement | null>(null);
 
   const renderListHeightChange = (
@@ -86,7 +87,7 @@ export default function InfiniteScroll<T>(props: Props<T>) {
         });
 
         // call api's condition
-        if (Math.round(i / apiSignalIndex) > 1) {
+        if (Math.round(i + 2 / apiSignalIndex) > 1) {
           onFetchApiSignal(Math.round(i / apiSignalIndex));
         }
         break;
@@ -106,21 +107,28 @@ export default function InfiniteScroll<T>(props: Props<T>) {
 
   useEffect(() => {
     if (list?.length > 0) {
-      const map = new Set();
+      if (hasNewData && scrollContainerRef?.current) {
+        scrollContainerRef.current.scrollTo(0, 0);
+      }
+
+      const currentAllListSet = new Set();
       allList.forEach((item) => {
-        map.add(item.infiniteScrollId);
+        currentAllListSet.add(item.infiniteScrollId);
       });
+
+      const recentListLength = hasNewData ? 0 : allList.length;
       const filterNewList = hasNewData
         ? list
-        : list.filter((item, index) => !map.has(index));
+        : list.filter((item, index) => !currentAllListSet.has(index));
       const allListExtendsConfig = filterNewList.map((item, index) => ({
         ...item,
-        infiniteScrollId: allList.length + index,
+        infiniteScrollId: recentListLength + index,
         hasRenderBefore: false,
         renderListKey: Date.now(),
-        itemOffsetTop: (allList.length + index) * itemHeight,
+        itemOffsetTop: (recentListLength + index) * itemHeight,
         itemHeight,
       }));
+
       setAllList(
         hasNewData
           ? allListExtendsConfig
@@ -145,7 +153,11 @@ export default function InfiniteScroll<T>(props: Props<T>) {
   }, [list, itemHeight, renderCount, hasNewData]);
 
   return (
-    <div className="scroll-container" onScroll={onScroll}>
+    <div
+      className="scroll-container"
+      ref={scrollContainerRef}
+      onScroll={onScroll}
+    >
       <div
         className="scroll-list"
         ref={scrollListRef}
